@@ -12,3 +12,7 @@ PYTHON_FUTURE_LICENSE = MIT
 PYTHON_FUTURE_LICENSE_FILES = LICENSE.txt
 
 $(eval $(python-package))
+
+ifeq ($(BR2_PACKAGE_HOST_PYTHON_FUTURE),y)
+$(eval $(host-python-package))
+endif
