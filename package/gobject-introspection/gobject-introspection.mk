@@ -63,9 +63,14 @@ GOBJECT_INTROSPECTION_CONF_ENV = \
 HOST_GOBJECT_INTROSPECTION_CONF_ENV = \
 	GI_SCANNER_DISABLE_CACHE=1
 
+# workaround shebang line too long, going over the limit
+#GOBJECT_INTROSPECTION_HOST_PYTHON = $(@D)/py3
+GOBJECT_INTROSPECTION_HOST_PYTHON = $(BUILD_DIR)/host-gobj-py3
+
 # Make sure g-ir-tool-template uses the host python.
 define GOBJECT_INTROSPECTION_FIX_TOOLTEMPLATE_PYTHON_PATH
-	$(SED) '1s%#!.*%#!$(HOST_DIR)/bin/python%' $(@D)/tools/g-ir-tool-template.in
+	ln -sf $(HOST_DIR)/bin/python $(GOBJECT_INTROSPECTION_HOST_PYTHON)
+	$(SED) '1s%#!.*%#!$(GOBJECT_INTROSPECTION_HOST_PYTHON)%' $(@D)/tools/g-ir-tool-template.in
 endef
 HOST_GOBJECT_INTROSPECTION_PRE_CONFIGURE_HOOKS += GOBJECT_INTROSPECTION_FIX_TOOLTEMPLATE_PYTHON_PATH
 
@@ -75,7 +80,8 @@ HOST_GOBJECT_INTROSPECTION_PRE_CONFIGURE_HOOKS += GOBJECT_INTROSPECTION_FIX_TOOL
 # - Create a safe modules directory which does not exist so we don't load random things
 #   which may then get deleted (or their dependencies) and potentially segfault
 define GOBJECT_INTROSPECTION_INSTALL_PRE_WRAPPERS
-	$(SED) '1s%#!.*%#!$(HOST_DIR)/bin/python%' $(@D)/tools/g-ir-tool-template.in
+	ln -sf $(HOST_DIR)/bin/python $(GOBJECT_INTROSPECTION_HOST_PYTHON)
+	$(SED) '1s%#!.*%#!$(GOBJECT_INTROSPECTION_HOST_PYTHON)%' $(@D)/tools/g-ir-tool-template.in
 
 	$(INSTALL) -D -m 755 $(GOBJECT_INTROSPECTION_PKGDIR)/g-ir-scanner-lddwrapper.in \
 		$(STAGING_DIR)/usr/bin/g-ir-scanner-lddwrapper
