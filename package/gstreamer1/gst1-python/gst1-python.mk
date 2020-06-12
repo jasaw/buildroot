@@ -15,6 +15,16 @@ GST1_PYTHON_DEPENDENCIES = \
 	gstreamer1 \
 	python-gobject
 
+# HACK: PKG_PYTHON_SYSCONFIGDATA_NAME gets evaluated before
+#       $(STAGING_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/_sysconfigdata__linux_*.py
+#       exists. Always define it to a known value for now until it is fixed on
+#       upstream buildroot.
+ifeq ($(BR2_aarch64),y)
+define PKG_PYTHON_SYSCONFIGDATA_NAME
+_sysconfigdata__linux_aarch64-linux-gnu
+endef
+endif
+
 # A sysconfigdata_name must be manually specified or the resulting .so
 # will have a x86_64 prefix, which causes "from gi.repository import Gst"
 # to fail. A pythonpath must be specified or the host python path will be
